@@ -5,7 +5,7 @@ static int func_cnt = 0;
 int main()
 {
     int split_num = 4;
-    int unrol_num = 12;
+    int unrol_num = 24;
 
     gen_init(split_num * unrol_num);
     for (int s = 1; s <= split_num; s++) {
@@ -34,6 +34,26 @@ void gen_init(int func_num)
     }
     fprintf(cf, "};\n");
     fclose(cf);
+}
+
+/* emit a balanced-tree sum of terms a[i+lo]*x_pow_lo .. a[i+hi]*x_pow_hi.
+ * Balanced parenthesization keeps the add-reduction depth at O(log n)
+ * instead of the O(n) left-associative chain, exposing more ILP.
+ * NOTE: this intentionally changes the floating-point addition order, so
+ * results are not guaranteed bit-identical to the chain version for a
+ * general x. The benchmark uses x = -1 (integer terms), so it stays exact. */
+static void emit_tree(FILE *cf, int lo, int hi)
+{
+    if (lo == hi) {
+        fprintf(cf, "a[i + %d] * x_pow_%d", lo, lo);
+        return;
+    }
+    int mid = (lo + hi) / 2;
+    fprintf(cf, "(");
+    emit_tree(cf, lo, mid);
+    fprintf(cf, " + ");
+    emit_tree(cf, mid + 1, hi);
+    fprintf(cf, ")");
 }
 
 void gen_append_poly(int split_num, int unrol_num)
@@ -69,14 +89,10 @@ void gen_append_poly(int split_num, int unrol_num)
     /* main for loop */
     fprintf(cf, "for (i = 1; i <= degree - %d; i += %d) {\n", pw_times - 1,
             pw_times);
-    int idx_cnt = 0;
     for (int k = 0; k < split_num; k++) {
-        fprintf(cf, "result_%d += (a[i + %d] * x_pow_%d", k, idx_cnt, idx_cnt);
-        idx_cnt++;
-        for (int l = 1; l < unrol_num; l++) {
-            fprintf(cf, " + a[i + %d] * x_pow_%d", idx_cnt, idx_cnt);
-            idx_cnt++;
-        }
+        int base = k * unrol_num;
+        fprintf(cf, "result_%d += (", k);
+        emit_tree(cf, base, base + unrol_num - 1);
         fprintf(cf, ") * xpwr;\n");
     }
     fprintf(cf, "xpwr = xpwr * x_pow_%d;\n", pw_times);

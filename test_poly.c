@@ -12,7 +12,7 @@ typedef double (*PolyFunc)(double a[], double x, long degree);
 #define MAX_DEGREE 1000
 #define DEGREE_STEP 10
 #define SPLIT_MAX 4
-#define UNROL_MAX 12
+#define UNROL_MAX 24
 #define FUNC_NUM SPLIT_MAX *UNROL_MAX
 
 typedef struct _RunData RunData;
@@ -226,7 +226,7 @@ double compare_test(int func_num, int *min_cpe_idx, char *argv[])
         double CPE = 0.0;
         // if j is 0 cannot compute the ratio (CPE / j)
         for (int j = DEGREE_STEP; j < MAX_DEGREE; j += DEGREE_STEP) {
-            int func_idx = (split_num[i] - 1) * 8 + (unrol_num[i] - 1);
+            int func_idx = (split_num[i] - 1) * UNROL_MAX + (unrol_num[i] - 1);
             double cycle = test_poly(func_arr[func_idx], j, cpu_freq);
             CPE += (cycle / j);
         }
@@ -257,7 +257,7 @@ void plot_test(int func_num, char *argv[])
         fprintf(plot_output, "%d ", i);
         double cycle;
         for (int j = 0; j < func_num; j++) {
-            int func_idx = (split_num[j] - 1) * 8 + (unrol_num[j] - 1);
+            int func_idx = (split_num[j] - 1) * UNROL_MAX + (unrol_num[j] - 1);
             cycle = test_poly(func_arr[func_idx], i, cpu_freq);
             fprintf(plot_output, "%lf ", cycle);
         }
