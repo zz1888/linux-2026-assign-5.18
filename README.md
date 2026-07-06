@@ -30,13 +30,13 @@ $ make default
 ./test_poly default
 Please copy the result between lines
 --------------------
-Intel(R) Core(TM) i7-7500U CPU @ 2.70GHz
-CPU max freq = 3500000000 hz
-1,10: 1.126268
-1,6: 1.147574
-1,8: 1.149880
-1,9: 1.150835
-1,7: 1.153622
+Intel(R) Core(TM) i5-8400 CPU @ 2.80GHz
+CPU max freq = 4000000000 hz
+1,8: 1.149729
+1,10: 1.149996
+1,9: 1.161892
+1,7: 1.167951
+2,5: 1.174901
 --------------------
 Program closing...
 ```
