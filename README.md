@@ -20,6 +20,24 @@ We use **gnuplot** to plot the performance comparison graph. So you need it inst
 $ sudo apt install gnuplot
 ```
 
+For profiling, **perf** and **uftrace** are useful for collecting hardware counter data and function-level traces.
+On Ubuntu, install them with:
+```
+$ sudo apt install linux-tools-common linux-tools-generic linux-tools-$(uname -r)
+$ sudo apt install uftrace
+```
+
+If `perf` is still unavailable, check whether the kernel-specific package is installed:
+```
+$ perf --version
+$ uname -r
+```
+
+For `uftrace`, verify the installation with:
+```
+$ uftrace --version
+```
+
 ## Running the test
 There are altogether 3 types of tests provided by our program.
 
